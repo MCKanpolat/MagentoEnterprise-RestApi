@@ -30,15 +30,15 @@ namespace Magento.RestApi.Json
     /// </summary>
     public class JsonSerializer : ISerializer, IDeserializer
     {
-        private JsonSerializerSettings _settings;
+        protected JsonSerializerSettings _settings;
 
         /// <summary>
         /// Default serializer
         /// </summary>
         public JsonSerializer()
         {
-            ContentType = "application/json";
-            _settings = new JsonSerializerSettings
+            this.ContentType = "application/json";
+            this._settings = new JsonSerializerSettings
                             {
                                 MissingMemberHandling = MissingMemberHandling.Ignore, 
                                 NullValueHandling = NullValueHandling.Include, 
@@ -53,7 +53,7 @@ namespace Magento.RestApi.Json
         /// <returns>JSON as String</returns>
         public string Serialize(object obj)
         {
-            var result = JsonConvert.SerializeObject(obj, _settings);
+            var result = JsonConvert.SerializeObject(obj, this._settings);
             return result;
         }
 
@@ -70,7 +70,7 @@ namespace Magento.RestApi.Json
 
 			return response.Content == "[]" 
                 ? default(T) 
-                : JsonConvert.DeserializeObject<T>(response.Content, _settings);
+                : JsonConvert.DeserializeObject<T>(response.Content, this._settings);
         }
 
         /// <summary>

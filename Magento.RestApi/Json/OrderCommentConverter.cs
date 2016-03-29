@@ -15,11 +15,11 @@ namespace Magento.RestApi.Json
             
             writer.WriteStartObject();
 
-            WriteProperty(orderComment, p => p.is_customer_notified, false, writer, serializer);
-            WriteProperty(orderComment, p => p.is_visible_on_front, false, writer, serializer);
-            WriteProperty(orderComment, p => p.comment, false, writer, serializer);
-            WriteProperty(orderComment, p => p.status, false, writer, serializer);
-            WriteProperty(orderComment, p => p.created_at, false, writer, serializer);
+            this.WriteProperty(orderComment, p => p.is_customer_notified, false, writer, serializer);
+            this.WriteProperty(orderComment, p => p.is_visible_on_front, false, writer, serializer);
+            this.WriteProperty(orderComment, p => p.comment, false, writer, serializer);
+            this.WriteProperty(orderComment, p => p.status, false, writer, serializer);
+            this.WriteProperty(orderComment, p => p.created_at, false, writer, serializer);
 
             writer.WriteEndObject();
         }

@@ -15,19 +15,19 @@ namespace Magento.RestApi.Json
             
             writer.WriteStartObject();
 
-            WriteProperty(orderAddress, p => p.address_type, true, writer, serializer);
-            WriteProperty(orderAddress, p => p.firstname, true, writer, serializer);
-            WriteProperty(orderAddress, p => p.lastname, true, writer, serializer);
-            WriteProperty(orderAddress, p => p.street, true, writer, serializer);
-            WriteProperty(orderAddress, p => p.city, true, writer, serializer);
-            WriteProperty(orderAddress, p => p.country_id, true, writer, serializer);
-            WriteProperty(orderAddress, p => p.region, false, writer, serializer);
-            WriteProperty(orderAddress, p => p.postcode, true, writer, serializer);
-            WriteProperty(orderAddress, p => p.telephone, true, writer, serializer);
-            WriteProperty(orderAddress, p => p.company, false, writer, serializer);
-            WriteProperty(orderAddress, p => p.middlename, false, writer, serializer);
-            WriteProperty(orderAddress, p => p.prefix, false, writer, serializer);
-            WriteProperty(orderAddress, p => p.suffix, false, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.address_type, true, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.firstname, true, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.lastname, true, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.street, true, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.city, true, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.country_id, true, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.region, false, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.postcode, true, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.telephone, true, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.company, false, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.middlename, false, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.prefix, false, writer, serializer);
+            this.WriteProperty(orderAddress, p => p.suffix, false, writer, serializer);
 
             writer.WriteEndObject();
         }

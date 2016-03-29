@@ -29,10 +29,10 @@ namespace Magento.RestApi.Json
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == null || objectType.IsEnum || IsNullableEnum(objectType);
+            return objectType == null || objectType.IsEnum || this.IsNullableEnum(objectType);
         }
 
-        private bool IsNullableEnum(Type t)
+        protected bool IsNullableEnum(Type t)
         {
             Type u = Nullable.GetUnderlyingType(t);
             return (u != null) && u.IsEnum;

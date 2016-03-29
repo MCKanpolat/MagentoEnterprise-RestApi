@@ -13,9 +13,9 @@ namespace Magento.RestApi.Json
         {
             var groupPrice = value as GroupPrice;
             writer.WriteStartObject();
-            WriteProperty(groupPrice, p => p.cust_group, true, writer, serializer);
-            WriteProperty(groupPrice, p => p.price, true, writer, serializer);
-            WriteProperty(groupPrice, p => p.website_id, true, writer, serializer);
+            this.WriteProperty(groupPrice, p => p.cust_group, true, writer, serializer);
+            this.WriteProperty(groupPrice, p => p.price, true, writer, serializer);
+            this.WriteProperty(groupPrice, p => p.website_id, true, writer, serializer);
             writer.WriteEndObject();
         }
 

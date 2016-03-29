@@ -21,31 +21,31 @@ namespace Magento.RestApi
     /// </summary>
     public class MagentoApi : IMagentoApi
     {
-        private string _url;
-        private string _consumerKey;
-        private string _consumerSecret;
-        private string _accessTokenKey;
-        private string _accessTokenSecret;
-        private string _adminUrlPart = "admin";
-        private string _callbackUrl = "http://localhost:8888";
-        private string _userName;
-        private string _password;
-        private bool _hasAuthenticatedWithAdminAuthentication;
-        private bool _isAuthenticating;
+        protected string _url;
+        protected string _consumerKey;
+        protected string _consumerSecret;
+        protected string _accessTokenKey;
+        protected string _accessTokenSecret;
+        protected string _adminUrlPart = "admin";
+        protected string _callbackUrl = "http://localhost:8888";
+        protected string _userName;
+        protected string _password;
+        protected bool _hasAuthenticatedWithAdminAuthentication;
+        protected bool _isAuthenticating;
     
-        private JsonSerializer _jsonSerializer;
-        private RestClient _client;
+        protected JsonSerializer _jsonSerializer;
+        protected RestClient _client;
 
-        private RestClient Client
+        protected RestClient Client
         {
             get
             {
-                if (!_isAuthenticating) return _client;
-                lock (_client)
+                if (!this._isAuthenticating) return this._client;
+                lock (this._client)
                 {
                     // lock access to the client when authenticating
                 }
-                return _client;
+                return this._client;
             }
         }
         
@@ -72,26 +72,26 @@ namespace Magento.RestApi
             if (string.IsNullOrEmpty(consumerKey)) throw new ArgumentNullException(consumerKey);
             if (string.IsNullOrEmpty(consumerSecret)) throw new ArgumentNullException(consumerSecret);
 
-            _url = url.TrimEnd('/');
-            _consumerKey = consumerKey;
-            _consumerSecret = consumerSecret;
-            
-            InitializeRestClient();
+            this._url = url.TrimEnd('/');
+            this._consumerKey = consumerKey;
+            this._consumerSecret = consumerSecret;
+
+            this.InitializeRestClient();
 
             return this;
         }
 
-        private void InitializeRestClient()
+        protected void InitializeRestClient()
         {
-            _jsonSerializer = new JsonSerializer();
-            _client = new RestClient(_url);
+            this._jsonSerializer = new JsonSerializer();
+            this._client = new RestClient(this._url);
 
-            _client.AddDefaultHeader("Content-Type", "application/json");
+            this._client.AddDefaultHeader("Content-Type", "application/json");
             // Seriously Magento? http://www.magentocommerce.com/boards/viewthread/295646/
-            _client.AddDefaultHeader("Content_Type", "application/json");
+            this._client.AddDefaultHeader("Content_Type", "application/json");
 
-            _client.ClearHandlers(); // http://stackoverflow.com/questions/22229393/why-is-restsharp-addheaderaccept-application-json-to-a-list-of-item
-            _client.AddHandler("application/json", _jsonSerializer);
+            this._client.ClearHandlers(); // http://stackoverflow.com/questions/22229393/why-is-restsharp-addheaderaccept-application-json-to-a-list-of-item
+            this._client.AddHandler("application/json", this._jsonSerializer);
         }
 
         #region Authentication
@@ -104,15 +104,11 @@ namespace Magento.RestApi
         /// <returns>this, for fluent configuration</returns>
         public IMagentoApi SetAccessToken(string accessTokenKey, string accessTokenSecret)
         {
-            _accessTokenKey = accessTokenKey;
-            _accessTokenSecret = accessTokenSecret;
+            this._accessTokenKey = accessTokenKey;
+            this._accessTokenSecret = accessTokenSecret;
 
-            InitializeRestClient();
-            _client.Authenticator = OAuth1Authenticator.ForProtectedResource(
-                _consumerKey,
-                _consumerSecret,
-                _accessTokenKey,
-                _accessTokenSecret);
+            this.InitializeRestClient();
+            this._client.Authenticator = OAuth1Authenticator.ForProtectedResource(this._consumerKey, this._consumerSecret, this._accessTokenKey, this._accessTokenSecret);
 
             return this;
         }
@@ -124,7 +120,7 @@ namespace Magento.RestApi
         /// <returns>this, for fluent configuration</returns>
         public IMagentoApi SetCustomAdminUrlPart(string adminUrlPart)
         {
-            if (!string.IsNullOrEmpty(adminUrlPart)) _adminUrlPart = adminUrlPart;
+            if (!string.IsNullOrEmpty(adminUrlPart)) this._adminUrlPart = adminUrlPart;
             return this;
         }
 
@@ -136,7 +132,7 @@ namespace Magento.RestApi
         /// <returns></returns>
         public IMagentoApi SetCallbackUrl(string callbackUrl)
         {
-            if (!string.IsNullOrEmpty(callbackUrl)) _callbackUrl = callbackUrl;
+            if (!string.IsNullOrEmpty(callbackUrl)) this._callbackUrl = callbackUrl;
             return this;
         }
 
@@ -149,79 +145,70 @@ namespace Magento.RestApi
         /// <returns>this, for fluent configuration</returns>
         public IMagentoApi AuthenticateAdmin(string userName, string password)
         {
-            lock (_client)
+            lock (this._client)
             {
                 try
                 {
-                    _isAuthenticating = true;
+                    this._isAuthenticating = true;
                     if (string.IsNullOrEmpty(userName)) throw new ArgumentNullException(userName);
                     if (string.IsNullOrEmpty(password)) throw new ArgumentNullException(password);
-                    _userName = userName;
-                    _password = password;
+                    this._userName = userName;
+                    this._password = password;
 
-                    InitializeRestClient();
-                    _client.Authenticator = OAuth1Authenticator.ForRequestToken(
-                        _consumerKey,
-                        _consumerSecret,
-                        _callbackUrl // Value for the oauth_callback parameter, we provide a value, but it won't be used.
+                    this.InitializeRestClient();
+                    this._client.Authenticator = OAuth1Authenticator.ForRequestToken(this._consumerKey, this._consumerSecret, this._callbackUrl // Value for the oauth_callback parameter, we provide a value, but it won't be used.
                         );
 
                     // PART 1: Getting an Unauthorized Request Token
                     var request = new RestRequest("/oauth/initiate", Method.POST);
-                    var response = _client.Execute(request);
+                    var response = this._client.Execute(request);
 
-                    if (response.ErrorException != null) throw new MagentoApiException(string.Format("Unable to get unauthorized access token for url: '{0}'. This usually indicates the provided url is not correct or a connection issue.", _url + "/oauth/initiate"), response.ErrorException);
-                    if (response.Content.Contains("oauth_problem=consumer_key_rejected")) throw new MagentoApiException(string.Format("The provided consumer key was rejected by the server at url '{0}' for consumer key '{1}'.", _url + "/oauth/initiate", _consumerKey));
-                    if (response.Content.Contains("oauth_problem=signature_invalid")) throw new MagentoApiException(string.Format("The provided consumer secret was rejected by the server at url '{0}' for consumer key '{1}'.", _url + "/oauth/initiate", _consumerKey));
-                    if (response.Content.Contains("oauth_problem=timestamp_refused")) throw new MagentoApiException(string.Format("The timestamp is incorrect at '{0}' for consumer key '{1}'. This usually indicates a big gap between client and server time.", _url + "/oauth/initiate", _consumerKey));
-                    if (response.Content.Contains("oauth_problem=")) throw new MagentoApiException(string.Format("There was a problem with oauth at '{0}' for consumer key '{1}'. Message: '{2}'", _url + "/oauth/initiate", _consumerKey, response.Content));
+                    if (response.ErrorException != null) throw new MagentoApiException(string.Format("Unable to get unauthorized access token for url: '{0}'. This usually indicates the provided url is not correct or a connection issue.", this._url + "/oauth/initiate"), response.ErrorException);
+                    if (response.Content.Contains("oauth_problem=consumer_key_rejected")) throw new MagentoApiException(string.Format("The provided consumer key was rejected by the server at url '{0}' for consumer key '{1}'.", this._url + "/oauth/initiate", this._consumerKey));
+                    if (response.Content.Contains("oauth_problem=signature_invalid")) throw new MagentoApiException(string.Format("The provided consumer secret was rejected by the server at url '{0}' for consumer key '{1}'.", this._url + "/oauth/initiate", this._consumerKey));
+                    if (response.Content.Contains("oauth_problem=timestamp_refused")) throw new MagentoApiException(string.Format("The timestamp is incorrect at '{0}' for consumer key '{1}'. This usually indicates a big gap between client and server time.", this._url + "/oauth/initiate", this._consumerKey));
+                    if (response.Content.Contains("oauth_problem=")) throw new MagentoApiException(string.Format("There was a problem with oauth at '{0}' for consumer key '{1}'. Message: '{2}'", this._url + "/oauth/initiate", this._consumerKey, response.Content));
 
                     var queryStringValues = HttpUtility.ParseQueryString(response.Content);
 
                     var oauthToken = queryStringValues["oauth_token"];
                     var oauthTokenSecret = queryStringValues["oauth_token_secret"];
 
-                    var authorizeUrl = _url + "/" + _adminUrlPart;
+                    var authorizeUrl = this._url + "/" + this._adminUrlPart;
 
                     var webClient = new MagentoWebClient();
                     // PART 2: Log in the application
-                    var confirmAuthorizeUrl = Login(webClient, authorizeUrl, _userName, _password, oauthToken);
+                    var confirmAuthorizeUrl = this.Login(webClient, authorizeUrl, this._userName, this._password, oauthToken);
 
                     // PART 3: Authorize the application for the logged in user
-                    var requestTokenVerifier = Authorize(webClient, confirmAuthorizeUrl, oauthToken);
+                    var requestTokenVerifier = this.Authorize(webClient, confirmAuthorizeUrl, oauthToken);
 
                     // PART 4: Getting an Access Token
-                    _client.Authenticator = OAuth1Authenticator.ForAccessToken(
-                        _consumerKey,
-                        _consumerSecret,
+                    this._client.Authenticator = OAuth1Authenticator.ForAccessToken(this._consumerKey, this._consumerSecret,
                         oauthToken,
                         oauthTokenSecret,
                         requestTokenVerifier
                         );
 
                     request = new RestRequest("/oauth/token", Method.POST);
-                    response = _client.Execute(request);
+                    response = this._client.Execute(request);
 
                     if (response.ErrorException != null) throw new MagentoApiException("Cannot retrieve accestoken", response.ErrorException);
 
                     queryStringValues = HttpUtility.ParseQueryString(response.Content);
 
-                    _accessTokenKey = queryStringValues["oauth_token"];
-                    _accessTokenSecret = queryStringValues["oauth_token_secret"];
-                    _hasAuthenticatedWithAdminAuthentication = true;
+                    this._accessTokenKey = queryStringValues["oauth_token"];
+                    this._accessTokenSecret = queryStringValues["oauth_token_secret"];
+                    this._hasAuthenticatedWithAdminAuthentication = true;
 
-                    InitializeRestClient();
-                    _client.Authenticator = OAuth1Authenticator.ForProtectedResource(
-                        _consumerKey,
-                        _consumerSecret,
-                        _accessTokenKey,
-                        _accessTokenSecret);
+                    this.InitializeRestClient();
+                    this._client.Authenticator = OAuth1Authenticator.ForProtectedResource(this._consumerKey, this._consumerSecret, this._accessTokenKey, this._accessTokenSecret);
 
                     return this;
                 }
                 finally
                 {
-                    _isAuthenticating = false;
+                    this._isAuthenticating = false;
                 }
             }
         }
@@ -235,7 +222,7 @@ namespace Magento.RestApi
         /// <param name="password">The password of the user</param>
         /// <param name="oauthToken">The token received from the unauthorized request</param>
         /// <returns>The authorization url where the logged in user can authorize the application</returns>
-        private string Login(MagentoWebClient webClient, string loginUrl, string userName, string password, string oauthToken)
+        protected string Login(MagentoWebClient webClient, string loginUrl, string userName, string password, string oauthToken)
         {
             // Get the login page and find the form post action url and the formkey
             var loginPage = new HtmlDocument();
@@ -267,12 +254,12 @@ namespace Magento.RestApi
             postRequest.Method = "POST";
             postRequest.ContentType = "application/x-www-form-urlencoded";
             postRequest.AllowAutoRedirect = false;
-			
+            
             var cookieContainer = new CookieContainer();
             if (!string.IsNullOrEmpty(webClient.AdminHtml))
                 cookieContainer.Add(new Uri(postRequest.RequestUri.GetLeftPart(UriPartial.Authority)), new Cookie("adminhtml", webClient.AdminHtml));
             postRequest.CookieContainer = cookieContainer;
-			
+            
             var postData = string.Format("form_key={0}&login%5busername%5d={1}&login%5bpassword%5d={2}&oauth_token={3}", formKey, userName, password, oauthToken);
             byte[] postDataBytes = new ASCIIEncoding().GetBytes(postData);
             postRequest.ContentLength = postDataBytes.Length;
@@ -297,7 +284,7 @@ namespace Magento.RestApi
         /// <param name="confirmAuthorizeUrl">The url to confirm the authorization</param>
         /// <param name="oauthToken">The token received from the unauthorized request</param>
         /// <returns>The oauth verifier that is used to retrieve the access token</returns>
-        private string Authorize(MagentoWebClient webClient, string confirmAuthorizeUrl, string oauthToken)
+        protected string Authorize(MagentoWebClient webClient, string confirmAuthorizeUrl, string oauthToken)
         {
             // Get the authorize page where the user confirms the application authorization and gets the form get action url
             var authorizePage = new HtmlDocument();
@@ -306,7 +293,7 @@ namespace Magento.RestApi
                 authorizePage.Load(responseStream);
             }
             var formElement = authorizePage.GetElementbyId("oauth_authorize_confirm");
-            if(authorizePage.DocumentNode.InnerText.Contains("Invalid User Name or Password") || formElement == null) throw new MagentoApiException(string.Format("The provided admin username '{0}' or password is invalid. The user needs to be a Magento admin.", _userName));
+            if(authorizePage.DocumentNode.InnerText.Contains("Invalid User Name or Password") || formElement == null) throw new MagentoApiException(string.Format("The provided admin username '{0}' or password is invalid. The user needs to be a Magento admin.", this._userName));
             var actionUrl = formElement.GetAttributeValue("action", string.Empty);
 
             // Submit the form by a get
@@ -327,9 +314,9 @@ namespace Magento.RestApi
         /// <summary>
         /// Helper for the Magento.RestApi.Client: adds functionality for retrieving and setting the adminhtml cookie
         /// </summary>
-        private class MagentoWebClient : WebClient
+        protected class MagentoWebClient : WebClient
         {
-            public string AdminHtml { get; private set; }
+            public string AdminHtml { get; protected set; }
 
             protected override WebRequest GetWebRequest(Uri address)
             {
@@ -337,8 +324,8 @@ namespace Magento.RestApi
                 if (request is HttpWebRequest)
                 {
                     var cookieContainer = new CookieContainer();
-                    if (!string.IsNullOrEmpty(AdminHtml))
-                        cookieContainer.Add(new Uri(request.RequestUri.GetLeftPart(UriPartial.Authority)), new Cookie("adminhtml", AdminHtml));
+                    if (!string.IsNullOrEmpty(this.AdminHtml))
+                        cookieContainer.Add(new Uri(request.RequestUri.GetLeftPart(UriPartial.Authority)), new Cookie("adminhtml", this.AdminHtml));
                     (request as HttpWebRequest).CookieContainer = cookieContainer;
                 }
                 return request;
@@ -350,14 +337,14 @@ namespace Magento.RestApi
                 if (response != null)
                 {
                     var setCookieHeader = response.Headers[HttpResponseHeader.SetCookie];
-                    SetAdminHtmlFromCookie(setCookieHeader);
+                    this.SetAdminHtmlFromCookie(setCookieHeader);
                 }
                 return response;
             }
 
             public void SetAdminHtmlFromCookie(string cookieString)
             {
-                AdminHtml = cookieString.Substring(cookieString.LastIndexOf("adminhtml=", StringComparison.Ordinal)).Replace("adminhtml=", "").Split(';')[0];
+                this.AdminHtml = cookieString.Substring(cookieString.LastIndexOf("adminhtml=", StringComparison.Ordinal)).Replace("adminhtml=", "").Split(';')[0];
             }
         }
 
@@ -378,7 +365,7 @@ namespace Magento.RestApi
                                   Resource = url,
                                   Method = method,
                                   RequestFormat = DataFormat.Json,
-                                  JsonSerializer = _jsonSerializer
+                                  JsonSerializer = this._jsonSerializer
                               };
             return request;
         }
@@ -392,11 +379,11 @@ namespace Magento.RestApi
         /// <returns></returns>
         protected async Task<MagentoApiResponse<T>> Execute<T>(IRestRequest request, bool isSecondTry = false) where T : new()
         {
-            Client.FollowRedirects = request.Method != Method.POST;
-            var response = await Client.ExecuteTaskAsync<T>(request);
+            this.Client.FollowRedirects = request.Method != Method.POST;
+            var response = await this.Client.ExecuteTaskAsync<T>(request);
             if (response.ContentType.ToUpperInvariant().Contains("APPLICATION/JSON"))
             {
-                return await HandleResponse(response, request, isSecondTry);
+                return await this.HandleResponse(response, request, isSecondTry);
             }
             var errors = new List<MagentoError>
             {
@@ -412,7 +399,7 @@ namespace Magento.RestApi
             return new MagentoApiResponse<T>
             {
                 Errors = errors, 
-                RequestUrl = Client.BuildUri(request), 
+                RequestUrl = this.Client.BuildUri(request), 
                 ErrorString = response.Content,
                 RequestContent = requestContent
             };
@@ -438,13 +425,13 @@ namespace Magento.RestApi
                 if (!isSecondTry 
                     && response.StatusCode == HttpStatusCode.Unauthorized
                     && response.Content.Contains("oauth_problem=")
-                    && _hasAuthenticatedWithAdminAuthentication)
+                    && this._hasAuthenticatedWithAdminAuthentication)
                 {
-                    AuthenticateAdmin(_userName, _password);
-                    return await Execute<T>(request, true);
+                    this.AuthenticateAdmin(this._userName, this._password);
+                    return await this.Execute<T>(request, true);
                 }
 
-                var errors = GetErrorsFromResponse(response);
+                var errors = this.GetErrorsFromResponse(response);
 
                 var requestBodyParameter = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.RequestBody);
                 var requestContent = requestBodyParameter == null ? string.Empty : requestBodyParameter.Value == null ? string.Empty : requestBodyParameter.Value.ToString();
@@ -452,13 +439,13 @@ namespace Magento.RestApi
                 return new MagentoApiResponse<T>
                 {
                     Errors = errors,
-                    RequestUrl = Client.BuildUri(request),
+                    RequestUrl = this.Client.BuildUri(request),
                     ErrorString = response.Content,
                     RequestContent = requestContent
                 };
             }
 
-            return new MagentoApiResponse<T> { Result = response.Data, RequestUrl = Client.BuildUri(request) };
+            return new MagentoApiResponse<T> { Result = response.Data, RequestUrl = this.Client.BuildUri(request) };
         }
 
         /// <summary>
@@ -469,9 +456,9 @@ namespace Magento.RestApi
         /// <returns></returns>
         protected async Task<IRestResponse> Execute(IRestRequest request, bool isSecondTry = false)
         {
-            Client.FollowRedirects = request.Method != Method.POST;
-            var response = await Client.ExecuteTaskAsync(request);
-            return await HandleResponse(response, request, isSecondTry);
+            this.Client.FollowRedirects = request.Method != Method.POST;
+            var response = await this.Client.ExecuteTaskAsync(request);
+            return await this.HandleResponse(response, request, isSecondTry);
         }
 
         /// <summary>
@@ -493,10 +480,10 @@ namespace Magento.RestApi
                 if (!isSecondTry
                     && response.StatusCode == HttpStatusCode.Unauthorized
                     && response.Content.Contains("oauth_problem=")
-                    && _hasAuthenticatedWithAdminAuthentication)
+                    && this._hasAuthenticatedWithAdminAuthentication)
                 {
-                    AuthenticateAdmin(_userName, _password);
-                    return await Execute(request, true);
+                    this.AuthenticateAdmin(this._userName, this._password);
+                    return await this.Execute(request, true);
                 }
             }
             return response;
@@ -516,8 +503,8 @@ namespace Magento.RestApi
             return new MagentoApiResponse<bool>
             {
                 Result = true,
-                RequestUrl = Client.BuildUri(restResponse.Request),
-                Errors = GetErrorsFromResponse(restResponse),
+                RequestUrl = this.Client.BuildUri(restResponse.Request),
+                Errors = this.GetErrorsFromResponse(restResponse),
                 ErrorString = restResponse.Content,
                 RequestContent = requestContent
             };
@@ -597,10 +584,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<Product>>> GetProducts(Filter filter)
         {
-            var request = CreateRequest("/api/rest/products");
-            AddFilterToRequest(filter, request);
+            var request = this.CreateRequest("/api/rest/products");
+            this.AddFilterToRequest(filter, request);
 
-            var response = await Execute<Dictionary<int, Product>>(request);
+            var response = await this.Execute<Dictionary<int, Product>>(request);
             if (!response.HasErrors)
             {
                 if(response.Result == null) response.Result = new Dictionary<int, Product>();
@@ -617,10 +604,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<Product>>> GetProductsByCategoryId(int categoryId, Filter filter = null)
         {
-            var request = CreateRequest("/api/rest/products");
+            var request = this.CreateRequest("/api/rest/products");
             request.AddParameter("category_id", categoryId);
 
-            var response = await Execute<Dictionary<int, Product>>(request);
+            var response = await this.Execute<Dictionary<int, Product>>(request);
             if (!response.HasErrors)
             {
                 if (response.Result == null) response.Result = new Dictionary<int, Product>();
@@ -636,10 +623,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<Product>> GetProductById(int productId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}");
+            var request = this.CreateRequest("/api/rest/products/{productId}");
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
 
-            return await Execute<Product>(request);
+            return await this.Execute<Product>(request);
         }
 
         /// <summary>
@@ -650,11 +637,11 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<Product>> GetProductByIdForStore(int productId, int storeId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/store/{storeId}");
+            var request = this.CreateRequest("/api/rest/products/{productId}/store/{storeId}");
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddParameter("storeId", storeId, ParameterType.UrlSegment);
 
-            return await Execute<Product>(request);
+            return await this.Execute<Product>(request);
         }
 
         /// <summary>
@@ -665,11 +652,11 @@ namespace Magento.RestApi
         /// <exception cref="Magento.RestApi.MagentoApiException">If more than 1 product is returned for sku.</exception>
         public async Task<MagentoApiResponse<Product>> GetProductBySku(string sku)
         {
-            var request = CreateRequest("/api/rest/products");
+            var request = this.CreateRequest("/api/rest/products");
             request.AddParameter("filter[0][attribute]", "sku");
             request.AddParameter("filter[0][in]", sku);
 
-            var response = await Execute<Dictionary<int, Product>>(request);
+            var response = await this.Execute<Dictionary<int, Product>>(request);
             if (!response.HasErrors)
             {
                 if (response.Result == null) response.Result = new Dictionary<int, Product>();
@@ -688,10 +675,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<Product>> GetProductBySkuForStore(string sku, int storeId)
         {
-            var response = await GetProductBySku(sku);
+            var response = await this.GetProductBySku(sku);
             if (!response.HasErrors && response.Result != null)
             {
-                return await GetProductByIdForStore(response.Result.entity_id, storeId);
+                return await this.GetProductByIdForStore(response.Result.entity_id, storeId);
             }
             return response;
         }
@@ -705,10 +692,10 @@ namespace Magento.RestApi
         {
             if (product.entity_id != 0) throw new MagentoApiException("A new product can't have an entity_id.");
 
-            var request = CreateRequest("/api/rest/products", Method.POST);
+            var request = this.CreateRequest("/api/rest/products", Method.POST);
             request.AddBody(product);
 
-            var response = await Execute(request);
+            var response = await this.Execute(request);
             var productId = 0;
             var location = response.Headers.FirstOrDefault(h => h.Name.Equals("Location"));
             if (location != null)
@@ -718,8 +705,8 @@ namespace Magento.RestApi
             return new MagentoApiResponse<int>
                        {
                            Result = productId,
-                           RequestUrl = Client.BuildUri(response.Request),
-                           Errors = GetErrorsFromResponse(response),
+                           RequestUrl = this.Client.BuildUri(response.Request),
+                           Errors = this.GetErrorsFromResponse(response),
                            ErrorString = response.Content
                        };
         }
@@ -733,12 +720,12 @@ namespace Magento.RestApi
             if (product == null) throw new ArgumentNullException(nameof(product));
             if (product.HasChanged())
             {
-                var request = CreateRequest("/api/rest/products/{productId}", Method.PUT);
+                var request = this.CreateRequest("/api/rest/products/{productId}", Method.PUT);
                 request.AddParameter("productId", product.entity_id, ParameterType.UrlSegment);
                 request.AddBody(product);
 
-                var response = await Execute(request);
-                return CreateMagentoResponse(response, request);
+                var response = await this.Execute(request);
+                return this.CreateMagentoResponse(response, request);
             }
             return new MagentoApiResponse<bool> {Result = true};
         }
@@ -753,13 +740,13 @@ namespace Magento.RestApi
             if (product == null) throw new ArgumentNullException(nameof(product));
             if (product.HasChanged())
             {
-                var request = CreateRequest("/api/rest/products/{productId}/store/{storeId}", Method.PUT);
+                var request = this.CreateRequest("/api/rest/products/{productId}/store/{storeId}", Method.PUT);
                 request.AddParameter("productId", product.entity_id, ParameterType.UrlSegment);
                 request.AddParameter("storeId", storeId, ParameterType.UrlSegment);
                 request.AddBody(product);
 
-                var response = await Execute(request);
-                return CreateMagentoResponse(response, request);
+                var response = await this.Execute(request);
+                return this.CreateMagentoResponse(response, request);
             }
             return new MagentoApiResponse<bool> { Result = true };
         }
@@ -770,11 +757,11 @@ namespace Magento.RestApi
         /// <param name="productId"></param>
         public async Task<MagentoApiResponse<bool>> DeleteProduct(int productId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}", Method.DELETE);
+            var request = this.CreateRequest("/api/rest/products/{productId}", Method.DELETE);
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            return CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            return this.CreateMagentoResponse(response, request);
         }
 
         #endregion
@@ -788,24 +775,24 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<int>>> GetWebsitesForProduct(int productId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/websites");
+            var request = this.CreateRequest("/api/rest/products/{productId}/websites");
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            var errors = GetErrorsFromResponse(response);
+            var response = await this.Execute(request);
+            var errors = this.GetErrorsFromResponse(response);
             if (errors == null || errors.Count == 0)
             {
                 var result = JsonConvert.DeserializeObject(response.Content);
                 return new MagentoApiResponse<IList<int>>
                            {
-                               RequestUrl = _client.BuildUri(request),
+                               RequestUrl = this._client.BuildUri(request),
                                Result = (from object item in result as IEnumerable select (item as JObject)["website_id"].Value<int>()).ToList()
                            };
             }
             return new MagentoApiResponse<IList<int>>
                        {
                            Errors = errors,
-                           RequestUrl = _client.BuildUri(request)
+                           RequestUrl = this._client.BuildUri(request)
                        };
         }
 
@@ -816,12 +803,12 @@ namespace Magento.RestApi
         /// <param name="websiteId"></param>
         public async Task<MagentoApiResponse<bool>> AssignWebsiteToProduct(int productId, int websiteId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/websites", Method.POST);
+            var request = this.CreateRequest("/api/rest/products/{productId}/websites", Method.POST);
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddBody(new {website_id = websiteId});
 
-            var response = await Execute(request);
-            var magentoResponse = CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            var magentoResponse = this.CreateMagentoResponse(response, request);
             // if the response contains the error that the product is already assigned, then ignore it and remove the errors.
             if (magentoResponse.Errors != null && magentoResponse.Errors.Count(e => e.Message.Contains("Product #" + productId + " is already assigned to website #" + websiteId)) > 0)
             {
@@ -837,12 +824,12 @@ namespace Magento.RestApi
         /// <param name="websiteId"></param>
         public async Task<MagentoApiResponse<bool>> UnassignWebsiteFromProduct(int productId, int websiteId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/websites/{websiteId}", Method.DELETE);
+            var request = this.CreateRequest("/api/rest/products/{productId}/websites/{websiteId}", Method.DELETE);
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddParameter("websiteId", websiteId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            var magentoResponse = CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            var magentoResponse = this.CreateMagentoResponse(response, request);
             // if the response contains the error that the product is already assigned, then ignore it and remove the errors.
             if (magentoResponse.Errors != null && magentoResponse.Errors.Count(e => e.Message.Contains("Product #" + productId + " isn't assigned to website #" + websiteId)) > 0)
             {
@@ -863,24 +850,24 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<int>>> GetCategoriesForProduct(int productId, Filter filter = null)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/categories");
+            var request = this.CreateRequest("/api/rest/products/{productId}/categories");
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            var errors = GetErrorsFromResponse(response);
+            var response = await this.Execute(request);
+            var errors = this.GetErrorsFromResponse(response);
             if (errors == null || errors.Count == 0)
             {
                 var result = JsonConvert.DeserializeObject(response.Content);
                 return new MagentoApiResponse<IList<int>>
                 {
-                    RequestUrl = _client.BuildUri(request),
+                    RequestUrl = this._client.BuildUri(request),
                     Result = (from object item in result as IEnumerable select (item as JObject)["category_id"].Value<int>()).ToList()
                 };
             }
             return new MagentoApiResponse<IList<int>>
             {
                 Errors = errors,
-                RequestUrl = _client.BuildUri(request)
+                RequestUrl = this._client.BuildUri(request)
             };
         }
 
@@ -891,12 +878,12 @@ namespace Magento.RestApi
         /// <param name="categoryId"></param>
         public async Task<MagentoApiResponse<bool>> AssignCategoryToProduct(int productId, int categoryId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/categories", Method.POST);
+            var request = this.CreateRequest("/api/rest/products/{productId}/categories", Method.POST);
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddBody(new { category_id = categoryId });
 
-            var response = await Execute(request);
-            var magentoResponse = CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            var magentoResponse = this.CreateMagentoResponse(response, request);
             // if the response contains the error that the product is already assigned, then ignore it and remove the errors.
             if (magentoResponse.Errors != null && magentoResponse.Errors.Count(e => e.Message.Contains("Product #" + productId + " is already assigned to category #" + categoryId)) > 0)
             {
@@ -912,12 +899,12 @@ namespace Magento.RestApi
         /// <param name="categoryId"></param>
         public async Task<MagentoApiResponse<bool>> UnAssignCategoryFromProduct(int productId, int categoryId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/categories/{categoryId}", Method.DELETE);
+            var request = this.CreateRequest("/api/rest/products/{productId}/categories/{categoryId}", Method.DELETE);
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddParameter("categoryId", categoryId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            var magentoResponse = CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            var magentoResponse = this.CreateMagentoResponse(response, request);
             // if the response contains the error that the product is already assigned, then ignore it and remove the errors.
             if (magentoResponse.Errors != null && magentoResponse.Errors.Count(e => e.Message.Contains("Product #" + productId + " isn't assigned to category #" + categoryId)) > 0)
             {
@@ -939,10 +926,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<ImageInfo>>> GetImagesForProduct(int productId, Filter filter = null)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/images");
+            var request = this.CreateRequest("/api/rest/products/{productId}/images");
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             
-            var response = await Execute<List<ImageInfo>>(request);
+            var response = await this.Execute<List<ImageInfo>>(request);
             return !response.HasErrors 
                 ? new MagentoApiResponse<IList<ImageInfo>> { RequestUrl = response.RequestUrl, Result = response.Result ?? new List<ImageInfo>() }
                 : new MagentoApiResponse<IList<ImageInfo>> { RequestUrl = response.RequestUrl, Errors = response.Errors, ErrorString = response.ErrorString };
@@ -958,11 +945,11 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<ImageInfo>>> GetImagesForProductForStore(int productId, int storeId, Filter filter = null)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/images/store/{storeId}");
+            var request = this.CreateRequest("/api/rest/products/{productId}/images/store/{storeId}");
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddParameter("storeId", storeId, ParameterType.UrlSegment);
 
-            var response = await Execute<List<ImageInfo>>(request);
+            var response = await this.Execute<List<ImageInfo>>(request);
             return !response.HasErrors
                 ? new MagentoApiResponse<IList<ImageInfo>> { RequestUrl = response.RequestUrl, Result = response.Result ?? new List<ImageInfo>() }
                 : new MagentoApiResponse<IList<ImageInfo>> { RequestUrl = response.RequestUrl, Errors = response.Errors, ErrorString = response.ErrorString };
@@ -977,11 +964,11 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<ImageInfo>> GetImageInfoForProduct(int productId, int imageId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/images/{imageId}");
+            var request = this.CreateRequest("/api/rest/products/{productId}/images/{imageId}");
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddParameter("imageId", imageId, ParameterType.UrlSegment);
 
-            return await Execute<ImageInfo>(request);
+            return await this.Execute<ImageInfo>(request);
         }
 
         /// <summary>
@@ -994,12 +981,12 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<ImageInfo>> GetImageInfoForProductForStore(int productId, int storeId, int imageId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/images/{imageId}/store/{storeId}");
+            var request = this.CreateRequest("/api/rest/products/{productId}/images/{imageId}/store/{storeId}");
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddParameter("imageId", imageId, ParameterType.UrlSegment);
             request.AddParameter("storeId", storeId, ParameterType.UrlSegment);
 
-            return await Execute<ImageInfo>(request);
+            return await this.Execute<ImageInfo>(request);
         }
 
         /// <summary>
@@ -1019,13 +1006,13 @@ namespace Magento.RestApi
                 {
                     throw new MagentoApiException("You are trying to update the content for an existing image. Although the Magento api specifications seems to allow this, the content won't be updated and Magento will not let you know it didn't work, hence this exception. If you need to update the content for an image you need to delete the existing image and add a new one. I know, ridiculous.");
                 }
-                var request = CreateRequest("/api/rest/products/{productId}/images/{imageId}", Method.PUT);
+                var request = this.CreateRequest("/api/rest/products/{productId}/images/{imageId}", Method.PUT);
                 request.AddParameter("productId", productId, ParameterType.UrlSegment);
                 request.AddParameter("imageId", imageId, ParameterType.UrlSegment);
                 request.AddBody(imageInfo);
 
-                var response = await Execute(request);
-                return CreateMagentoResponse(response, request);
+                var response = await this.Execute(request);
+                return this.CreateMagentoResponse(response, request);
             }
             return new MagentoApiResponse<bool> { Result = true };
         }
@@ -1048,14 +1035,14 @@ namespace Magento.RestApi
                 {
                     throw new MagentoApiException("You are trying to update the content for an existing image. Although the Magento api specifications seems to allow this, the content won't be updated and Magento will not let you know it didn't work, hence this exception. If you need to update the content for an image you need to delete the existing image and add a new one. I know, ridiculous.");
                 }
-                var request = CreateRequest("/api/rest/products/{productId}/images/{imageId}/store/{storeId}", Method.PUT);
+                var request = this.CreateRequest("/api/rest/products/{productId}/images/{imageId}/store/{storeId}", Method.PUT);
                 request.AddParameter("productId", productId, ParameterType.UrlSegment);
                 request.AddParameter("storeId", storeId, ParameterType.UrlSegment);
                 request.AddParameter("imageId", imageId, ParameterType.UrlSegment);
                 request.AddBody(imageInfo);
 
-                var response = await Execute(request);
-                return CreateMagentoResponse(response, request);
+                var response = await this.Execute(request);
+                return this.CreateMagentoResponse(response, request);
             }
             return new MagentoApiResponse<bool> { Result = true };
         }
@@ -1071,11 +1058,11 @@ namespace Magento.RestApi
             if (image == null) throw new ArgumentNullException(nameof(image));
             if (image.HasChanged())
             {
-                var request = CreateRequest("/api/rest/products/{productId}/images", Method.POST);
+                var request = this.CreateRequest("/api/rest/products/{productId}/images", Method.POST);
                 request.AddParameter("productId", productId, ParameterType.UrlSegment);
                 request.AddBody(image);
 
-                var response = await Execute(request);
+                var response = await this.Execute(request);
                 var location = response.Headers.FirstOrDefault(h => h.Name.Equals("Location"));
                 var imageId = 0;
                 if (location != null)
@@ -1085,8 +1072,8 @@ namespace Magento.RestApi
                 var magentoResponse = new MagentoApiResponse<int>
                 {
                     Result = imageId,
-                    RequestUrl = Client.BuildUri(response.Request),
-                    Errors = GetErrorsFromResponse(response),
+                    RequestUrl = this.Client.BuildUri(response.Request),
+                    Errors = this.GetErrorsFromResponse(response),
                     ErrorString = response.Content
                 };
                 if (imageId == 0)
@@ -1111,12 +1098,12 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<bool>> UnassignImageFromProduct(int productId, int imageId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/images/{imageId}", Method.DELETE);
+            var request = this.CreateRequest("/api/rest/products/{productId}/images/{imageId}", Method.DELETE);
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddParameter("imageId", imageId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            return CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            return this.CreateMagentoResponse(response, request);
         }
 
         /// <summary>
@@ -1129,13 +1116,13 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<bool>> UnAssignImageFromProductForStore(int productId, int storeId, int imageId)
         {
-            var request = CreateRequest("/api/rest/products/{productId}/images/{imageId}/store/{storeId}", Method.DELETE);
+            var request = this.CreateRequest("/api/rest/products/{productId}/images/{imageId}/store/{storeId}", Method.DELETE);
             request.AddParameter("productId", productId, ParameterType.UrlSegment);
             request.AddParameter("imageId", imageId, ParameterType.UrlSegment);
             request.AddParameter("storeId", storeId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            return CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            return this.CreateMagentoResponse(response, request);
         }
 
         #endregion
@@ -1150,11 +1137,11 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<StockItem>> GetStockItemForProduct(int productId)
         {
-            var request = CreateRequest("/api/rest/stockitems");
+            var request = this.CreateRequest("/api/rest/stockitems");
             request.AddParameter("filter[0][attribute]", "product_id");
             request.AddParameter("filter[0][in][0]", productId);
 
-            var response = await Execute<List<StockItem>>(request);
+            var response = await this.Execute<List<StockItem>>(request);
             if (!response.HasErrors)
             {
                 if (response.Result == null) response.Result = new List<StockItem>();
@@ -1176,13 +1163,13 @@ namespace Magento.RestApi
             if (stockItem == null) throw new ArgumentNullException(nameof(stockItem));
             if (stockItem.HasChanged())
             {
-                var serverStockItem = await GetStockItemForProduct(productId);
-                var request = CreateRequest("/api/rest/stockitems/{itemId}", Method.PUT);
+                var serverStockItem = await this.GetStockItemForProduct(productId);
+                var request = this.CreateRequest("/api/rest/stockitems/{itemId}", Method.PUT);
                 request.AddParameter("itemId", serverStockItem.Result.item_id, ParameterType.UrlSegment);
                 request.AddBody(stockItem);
 
-                var response = await Execute(request);
-                return CreateMagentoResponse(response, request);
+                var response = await this.Execute(request);
+                return this.CreateMagentoResponse(response, request);
             }
             return new MagentoApiResponse<bool> { Result = true };
         }
@@ -1195,16 +1182,16 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<bool>> UpdateStockQuantityForProduct(int productId, double quantity)
         {
-            var serverStockItem = await GetStockItemForProduct(productId);
+            var serverStockItem = await this.GetStockItemForProduct(productId);
             if (!serverStockItem.HasErrors)
             {
-                var request = CreateRequest("/api/rest/stockitems/{itemId}", Method.PUT);
+                var request = this.CreateRequest("/api/rest/stockitems/{itemId}", Method.PUT);
                 request.AddParameter("itemId", serverStockItem.Result.item_id, ParameterType.UrlSegment);
                 var stockItem = new StockItem { qty = quantity };
                 request.AddBody(stockItem);
 
-                var response = await Execute(request);
-                return CreateMagentoResponse(response, request);
+                var response = await this.Execute(request);
+                return this.CreateMagentoResponse(response, request);
             }
             return new MagentoApiResponse<bool> { Errors = serverStockItem.Errors, ErrorString = serverStockItem.ErrorString, RequestUrl = serverStockItem.RequestUrl };
         }
@@ -1221,10 +1208,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<Customer>>> GetCustomers(Filter filter)
         {
-            var request = CreateRequest("/api/rest/customers");
-            AddFilterToRequest(filter, request);
+            var request = this.CreateRequest("/api/rest/customers");
+            this.AddFilterToRequest(filter, request);
 
-            var response = await Execute<Dictionary<int, Customer>>(request);
+            var response = await this.Execute<Dictionary<int, Customer>>(request);
             if (!response.HasErrors)
             {
                 if (response.Result == null) response.Result = new Dictionary<int, Customer>();
@@ -1242,10 +1229,10 @@ namespace Magento.RestApi
         {
             if (customer.entity_id != 0) throw new MagentoApiException("A new customer can't have an entity_id.");
 
-            var request = CreateRequest("/api/rest/customers", Method.POST);
+            var request = this.CreateRequest("/api/rest/customers", Method.POST);
             request.AddBody(customer);
 
-            var response = await Execute(request);
+            var response = await this.Execute(request);
             int productId = 0;
             var location = response.Headers.FirstOrDefault(h => h.Name.Equals("Location"));
             if (location != null)
@@ -1255,8 +1242,8 @@ namespace Magento.RestApi
             return new MagentoApiResponse<int>
             {
                 Result = productId,
-                RequestUrl = Client.BuildUri(response.Request),
-                Errors = GetErrorsFromResponse(response),
+                RequestUrl = this.Client.BuildUri(response.Request),
+                Errors = this.GetErrorsFromResponse(response),
                 ErrorString = response.Content
             };
         }
@@ -1269,10 +1256,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<Customer>> GetCustomerById(int customerId)
         {
-            var request = CreateRequest("/api/rest/customers/{customerId}");
+            var request = this.CreateRequest("/api/rest/customers/{customerId}");
             request.AddParameter("customerId", customerId, ParameterType.UrlSegment);
 
-            return await Execute<Customer>(request);
+            return await this.Execute<Customer>(request);
         }
 
         /// <summary>
@@ -1286,12 +1273,12 @@ namespace Magento.RestApi
             if (customer == null) throw new ArgumentNullException(nameof(customer));
             if (customer.HasChanged())
             {
-                var request = CreateRequest("/api/rest/customers/{customerId}", Method.PUT);
+                var request = this.CreateRequest("/api/rest/customers/{customerId}", Method.PUT);
                 request.AddParameter("customerId", customer.entity_id, ParameterType.UrlSegment);
                 request.AddBody(customer);
 
-                var response = await Execute(request);
-                return CreateMagentoResponse(response, request);
+                var response = await this.Execute(request);
+                return this.CreateMagentoResponse(response, request);
             }
             return new MagentoApiResponse<bool> { Result = true };
         }
@@ -1303,11 +1290,11 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<bool>> DeleteCustomer(int customerId)
         {
-            var request = CreateRequest("/api/rest/customers/{customerId}", Method.DELETE);
+            var request = this.CreateRequest("/api/rest/customers/{customerId}", Method.DELETE);
             request.AddParameter("customerId", customerId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            return CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            return this.CreateMagentoResponse(response, request);
        }
 
         /// <summary>
@@ -1317,10 +1304,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<CustomerAddress>>> GetAddressesForCustomer(int customerId)
         {
-            var request = CreateRequest("/api/rest/customers/{customerId}/addresses");
+            var request = this.CreateRequest("/api/rest/customers/{customerId}/addresses");
             request.AddParameter("customerId", customerId, ParameterType.UrlSegment);
 
-            var response = await Execute<List<CustomerAddress>>(request);
+            var response = await this.Execute<List<CustomerAddress>>(request);
             if (!response.HasErrors)
             {
                 if (response.Result == null) response.Result = new List<CustomerAddress>();
@@ -1339,11 +1326,11 @@ namespace Magento.RestApi
         {
             if (address.entity_id != 0) throw new MagentoApiException("A new address can't have an entity_id.");
 
-            var request = CreateRequest("/api/rest/customers/{customerId}/addresses", Method.POST);
+            var request = this.CreateRequest("/api/rest/customers/{customerId}/addresses", Method.POST);
             request.AddParameter("customerId", customerId, ParameterType.UrlSegment);
             request.AddBody(address);
 
-            var response = await Execute(request);
+            var response = await this.Execute(request);
             int productId = 0;
             var location = response.Headers.FirstOrDefault(h => h.Name.Equals("Location"));
             if (location != null)
@@ -1353,8 +1340,8 @@ namespace Magento.RestApi
             return new MagentoApiResponse<int>
             {
                 Result = productId,
-                RequestUrl = Client.BuildUri(response.Request),
-                Errors = GetErrorsFromResponse(response),
+                RequestUrl = this.Client.BuildUri(response.Request),
+                Errors = this.GetErrorsFromResponse(response),
                 ErrorString = response.Content
             };
         }
@@ -1366,10 +1353,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<CustomerAddress>> GetCustomerAddressById(int addressId)
         {
-            var request = CreateRequest("/api/rest/customers/addresses/{addressId}");
+            var request = this.CreateRequest("/api/rest/customers/addresses/{addressId}");
             request.AddParameter("addressId", addressId, ParameterType.UrlSegment);
 
-            return await Execute<CustomerAddress>(request);
+            return await this.Execute<CustomerAddress>(request);
         }
 
         /// <summary>
@@ -1382,12 +1369,12 @@ namespace Magento.RestApi
             if (address == null) throw new ArgumentNullException(nameof(address));
             if (address.HasChanged())
             {
-                var request = CreateRequest("/api/rest/customers/addresses/{addressId}", Method.PUT);
+                var request = this.CreateRequest("/api/rest/customers/addresses/{addressId}", Method.PUT);
                 request.AddParameter("addressId", address.entity_id, ParameterType.UrlSegment);
                 request.AddBody(address);
 
-                var response = await Execute(request);
-                return CreateMagentoResponse(response, request);
+                var response = await this.Execute(request);
+                return this.CreateMagentoResponse(response, request);
             }
             return new MagentoApiResponse<bool> { Result = true };
         }
@@ -1399,11 +1386,11 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<bool>> DeleteCustomerAddress(int addressId)
         {
-            var request = CreateRequest("/api/rest/customers/addresses/{addressId}", Method.DELETE);
+            var request = this.CreateRequest("/api/rest/customers/addresses/{addressId}", Method.DELETE);
             request.AddParameter("addressId", addressId, ParameterType.UrlSegment);
 
-            var response = await Execute(request);
-            return CreateMagentoResponse(response, request);
+            var response = await this.Execute(request);
+            return this.CreateMagentoResponse(response, request);
         }
 
         #endregion
@@ -1417,10 +1404,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<IList<Order>>> GetOrders(Filter filter)
         {
-            var request = CreateRequest("/api/rest/orders");
-            AddFilterToRequest(filter, request);
+            var request = this.CreateRequest("/api/rest/orders");
+            this.AddFilterToRequest(filter, request);
 
-            var response = await Execute<Dictionary<int, Order>>(request);
+            var response = await this.Execute<Dictionary<int, Order>>(request);
             if (!response.HasErrors)
             {
                 if (response.Result == null) response.Result = new Dictionary<int, Order>();
@@ -1436,10 +1423,10 @@ namespace Magento.RestApi
         /// <returns></returns>
         public async Task<MagentoApiResponse<Order>> GetOrderById(int orderId)
         {
-            var request = CreateRequest("/api/rest/orders/{orderId}");
+            var request = this.CreateRequest("/api/rest/orders/{orderId}");
             request.AddParameter("orderId", orderId, ParameterType.UrlSegment);
 
-            return await Execute<Order>(request);
+            return await this.Execute<Order>(request);
         }
 
         #endregion

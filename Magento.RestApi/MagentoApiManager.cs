@@ -2,9 +2,9 @@
 {
     public class MagentoApiManager
     {
-        public Models.ApiSettings Settings { get; private set; }
-        public MagentoApi ApiClient { get; private set; }
-        public bool AccessTokensChanges { get; private set; }
+        public Models.ApiSettings Settings { get; protected set; }
+        public MagentoApi ApiClient { get; protected set; }
+        public bool AccessTokensChanges { get; protected set; }
 
         public MagentoApiManager(Models.ApiSettings settings)
         {
@@ -37,7 +37,7 @@
             };
         }
 
-        private void Initialize()
+        protected void Initialize()
         {
             this.ApiClient = new MagentoApi();
             this.ApiClient.Initialize(this.Settings.Url, this.Settings.ConsumerKey, this.Settings.ConsumerSecret)
@@ -48,7 +48,7 @@
             this.Authenticate();
         }
 
-        private bool Authenticate()
+        protected bool Authenticate()
         {
             this.ApiClient.AuthenticateAdmin(this.Settings.UserName, this.Settings.Password);
 

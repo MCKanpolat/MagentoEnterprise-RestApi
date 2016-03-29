@@ -16,13 +16,13 @@ namespace Magento.RestApi.Json
 
             writer.WriteStartObject();
 
-            WriteProperty(imageInfo, p => p.id, false, writer, serializer);
-            WriteProperty(imageInfo, p => p.exclude, false, writer, serializer);
-            WriteProperty(imageInfo, p => p.position, false, writer, serializer);
-            WriteProperty(imageInfo, p => p.label, false, writer, serializer);
-            WriteProperty(imageInfo, p => p.file_content, false, writer, serializer);
-            WriteProperty(imageInfo, p => p.file_mime_type, false, writer, serializer);
-            WriteProperty(imageInfo, p => p.file_name, false, writer, serializer);
+            this.WriteProperty(imageInfo, p => p.id, false, writer, serializer);
+            this.WriteProperty(imageInfo, p => p.exclude, false, writer, serializer);
+            this.WriteProperty(imageInfo, p => p.position, false, writer, serializer);
+            this.WriteProperty(imageInfo, p => p.label, false, writer, serializer);
+            this.WriteProperty(imageInfo, p => p.file_content, false, writer, serializer);
+            this.WriteProperty(imageInfo, p => p.file_mime_type, false, writer, serializer);
+            this.WriteProperty(imageInfo, p => p.file_name, false, writer, serializer);
 
             if (imageInfo.types != null && imageInfo.HasChanged(i => i.types))
             {

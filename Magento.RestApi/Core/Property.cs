@@ -10,22 +10,22 @@ namespace Magento.RestApi.Core
     [Serializable]
     public class Property<T> : IProperty
     {
-        private T _initialValue;
-        private T _value;
+        protected T _initialValue;
+        protected T _value;
 
         public T InitialValue
         {
-            get { return _initialValue; }
+            get { return this._initialValue; }
         }
 
-        public T Value { get { return _value; } set { _value = value; } }
+        public T Value { get { return this._value; } set { this._value = value; } }
 
         public bool HasChanged()
         {
             var hasChanged = false;
             if (typeof (T).IsAssignableFrom(typeof (IChangeTracking<T>)))
             {
-                hasChanged = (Value as IChangeTracking).HasChanged();
+                hasChanged = (this.Value as IChangeTracking).HasChanged();
             }
             else if (typeof(T).GetInterfaces().Any(x =>
                                                    x.IsGenericType &&
@@ -33,8 +33,8 @@ namespace Magento.RestApi.Core
                 !typeof(T).IsAssignableFrom(typeof(byte[])))
             {
                 var genericType = typeof (T).GetGenericArguments()[0];
-                var initialValue = _initialValue as IList;
-                var value = _value as IList;
+                var initialValue = this._initialValue as IList;
+                var value = this._value as IList;
                 if (!(value == null && initialValue == null))
                 {
                     if ((value == null && initialValue != null) || (value != null && initialValue == null))
@@ -71,17 +71,17 @@ namespace Magento.RestApi.Core
             }
             else
             {
-                hasChanged |= !Equals(_initialValue, _value);
+                hasChanged |= !Equals(this._initialValue, this._value);
             }
             return hasChanged;
         }
 
         public void SetValueAsInitial()
         {
-            _initialValue = DeepClone(_value);
+            this._initialValue = this.DeepClone(this._value);
         }
 
-        private C DeepClone<C>(C obj)
+        protected C DeepClone<C>(C obj)
         {
             if (obj == null) return default(C);
             using (var ms = new MemoryStream())

@@ -17,45 +17,45 @@ namespace Magento.RestApi.Json
             
             writer.WriteStartObject();
 
-            WriteProperty(product, p => p.entity_id, true, writer, serializer);
-            WriteProperty(product, p => p.sku, true, writer, serializer);
-            WriteProperty(product, p => p.visibility, true, writer, serializer);
-            WriteProperty(product, p => p.status, true, writer, serializer);
-            WriteProperty(product, p => p.name, true, writer, serializer);
-            WriteProperty(product, p => p.price, true, writer, serializer);
-            WriteProperty(product, p => p.weight, true, writer, serializer);
-            WriteProperty(product, p => p.tax_class_id, true, writer, serializer);
-            WriteProperty(product, p => p.description, true, writer, serializer);
+            this.WriteProperty(product, p => p.entity_id, true, writer, serializer);
+            this.WriteProperty(product, p => p.sku, true, writer, serializer);
+            this.WriteProperty(product, p => p.visibility, true, writer, serializer);
+            this.WriteProperty(product, p => p.status, true, writer, serializer);
+            this.WriteProperty(product, p => p.name, true, writer, serializer);
+            this.WriteProperty(product, p => p.price, true, writer, serializer);
+            this.WriteProperty(product, p => p.weight, true, writer, serializer);
+            this.WriteProperty(product, p => p.tax_class_id, true, writer, serializer);
+            this.WriteProperty(product, p => p.description, true, writer, serializer);
 
             // type_id is necessary for saving a new product
-            WriteProperty(product, p => p.type_id, false, writer, serializer);
+            this.WriteProperty(product, p => p.type_id, false, writer, serializer);
 
-            WriteProperty(product, p => p.attribute_set_id, false, writer, serializer);
-            WriteProperty(product, p => p.country_of_manufacture, false, writer, serializer);
-            WriteProperty(product, p => p.custom_design, false, writer, serializer);
-            WriteProperty(product, p => p.custom_design_from, false, writer, serializer);
-            WriteProperty(product, p => p.custom_design_to, false, writer, serializer);
-            WriteProperty(product, p => p.custom_layout_update, false, writer, serializer);
-            WriteProperty(product, p => p.description, false, writer, serializer);
-            WriteProperty(product, p => p.enable_googlecheckout, false, writer, serializer);
-            WriteProperty(product, p => p.gift_message_available, false, writer, serializer);
-            WriteProperty(product, p => p.meta_description, false, writer, serializer);
-            WriteProperty(product, p => p.meta_keyword, false, writer, serializer);
-            WriteProperty(product, p => p.meta_title, false, writer, serializer);
-            WriteProperty(product, p => p.msrp, false, writer, serializer);
-            WriteProperty(product, p => p.msrp_display_actual_price_type, false, writer, serializer);
-            WriteProperty(product, p => p.msrp_enabled, false, writer, serializer);
-            WriteProperty(product, p => p.news_from_date, false, writer, serializer);
-            WriteProperty(product, p => p.news_to_date, false, writer, serializer);
-            WriteProperty(product, p => p.options_container, false, writer, serializer);
-            WriteProperty(product, p => p.page_layout, false, writer, serializer);
-            WriteProperty(product, p => p.short_description, false, writer, serializer);
-            WriteProperty(product, p => p.special_from_date, false, writer, serializer);
-            WriteProperty(product, p => p.special_price, false, writer, serializer);
-            WriteProperty(product, p => p.special_to_date, false, writer, serializer);
-            WriteProperty(product, p => p.url_key, false, writer, serializer);
+            this.WriteProperty(product, p => p.attribute_set_id, false, writer, serializer);
+            this.WriteProperty(product, p => p.country_of_manufacture, false, writer, serializer);
+            this.WriteProperty(product, p => p.custom_design, false, writer, serializer);
+            this.WriteProperty(product, p => p.custom_design_from, false, writer, serializer);
+            this.WriteProperty(product, p => p.custom_design_to, false, writer, serializer);
+            this.WriteProperty(product, p => p.custom_layout_update, false, writer, serializer);
+            this.WriteProperty(product, p => p.description, false, writer, serializer);
+            this.WriteProperty(product, p => p.enable_googlecheckout, false, writer, serializer);
+            this.WriteProperty(product, p => p.gift_message_available, false, writer, serializer);
+            this.WriteProperty(product, p => p.meta_description, false, writer, serializer);
+            this.WriteProperty(product, p => p.meta_keyword, false, writer, serializer);
+            this.WriteProperty(product, p => p.meta_title, false, writer, serializer);
+            this.WriteProperty(product, p => p.msrp, false, writer, serializer);
+            this.WriteProperty(product, p => p.msrp_display_actual_price_type, false, writer, serializer);
+            this.WriteProperty(product, p => p.msrp_enabled, false, writer, serializer);
+            this.WriteProperty(product, p => p.news_from_date, false, writer, serializer);
+            this.WriteProperty(product, p => p.news_to_date, false, writer, serializer);
+            this.WriteProperty(product, p => p.options_container, false, writer, serializer);
+            this.WriteProperty(product, p => p.page_layout, false, writer, serializer);
+            this.WriteProperty(product, p => p.short_description, false, writer, serializer);
+            this.WriteProperty(product, p => p.special_from_date, false, writer, serializer);
+            this.WriteProperty(product, p => p.special_price, false, writer, serializer);
+            this.WriteProperty(product, p => p.special_to_date, false, writer, serializer);
+            this.WriteProperty(product, p => p.url_key, false, writer, serializer);
             // even if stock_data hasn't changed, the empty property needs to be written or some use_config values are set to true
-            WriteProperty(product, p => p.stock_data, false, writer, serializer);
+            this.WriteProperty(product, p => p.stock_data, false, writer, serializer);
 
             var groupPrice = product.GetProperty(p => p.group_price);
             if (product.group_price != null && groupPrice.HasChanged())

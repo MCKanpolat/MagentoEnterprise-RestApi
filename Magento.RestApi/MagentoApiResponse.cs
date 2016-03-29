@@ -13,7 +13,7 @@ namespace Magento.RestApi
 
         public bool HasErrors
         {
-            get { return Errors != null && Errors.Count > 0; }
+            get { return this.Errors != null && this.Errors.Count > 0; }
         }
     }
 }

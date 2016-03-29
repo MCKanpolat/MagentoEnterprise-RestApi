@@ -9,26 +9,26 @@ namespace Magento.RestApi.Core
     [Serializable]
     public class ChangeTracking<T> : IChangeTracking<T>
     {
-        private readonly Dictionary<string, IProperty> _properties = new Dictionary<string, IProperty>();
+        protected readonly Dictionary<string, IProperty> _properties = new Dictionary<string, IProperty>();
 
         [JsonIgnore]
-        public bool HasStartedTracking { get; private set; }
+        public bool HasStartedTracking { get; protected set; }
 
         public virtual bool HasChanged()
         {
-            return _properties.Aggregate(false, (current, property) => current | property.Value.HasChanged());
+            return this._properties.Aggregate(false, (current, property) => current | property.Value.HasChanged());
         }
 
         public bool HasChanged<P>(Expression<Func<T, P>> expression)
         {
             var name = (expression.Body as MemberExpression).Member.Name;
-            return _properties.ContainsKey(name) && _properties[name].HasChanged();
+            return this._properties.ContainsKey(name) && this._properties[name].HasChanged();
         }
 
         public virtual void StartTracking()
         {
-            HasStartedTracking = true;
-            foreach (var property in _properties)
+            this.HasStartedTracking = true;
+            foreach (var property in this._properties)
             {
                 property.Value.SetValueAsInitial();
             }
@@ -37,32 +37,32 @@ namespace Magento.RestApi.Core
         public P GetValue<P>(Expression<Func<T, P>> expression)
         {
             var name = (expression.Body as MemberExpression).Member.Name;
-            if (_properties.ContainsKey(name)) return (_properties[name] as Property<P>).Value;
+            if (this._properties.ContainsKey(name)) return (this._properties[name] as Property<P>).Value;
             var property = new Property<P>();
-            if (HasStartedTracking) property.SetValueAsInitial();
-            _properties.Add(name, property);
-            return (_properties[name] as Property<P>).Value;
+            if (this.HasStartedTracking) property.SetValueAsInitial();
+            this._properties.Add(name, property);
+            return (this._properties[name] as Property<P>).Value;
         }
 
         public void SetValue<P>(Expression<Func<T, P>> expression, P value)
         {
             var name = (expression.Body as MemberExpression).Member.Name;
-            if (!_properties.ContainsKey(name))
+            if (!this._properties.ContainsKey(name))
             {
                 var property = new Property<P>();
-                if (HasStartedTracking) property.SetValueAsInitial();
-                _properties.Add(name, property);
+                if (this.HasStartedTracking) property.SetValueAsInitial();
+                this._properties.Add(name, property);
 
             }
-            (_properties[name] as Property<P>).Value = value;
+            (this._properties[name] as Property<P>).Value = value;
         }
 
         public Property<P> GetProperty<P>(Expression<Func<T, P>> expression)
         {
             var name = (expression.Body as MemberExpression).Member.Name;
-            if (_properties.ContainsKey(name))
+            if (this._properties.ContainsKey(name))
             {
-                return _properties[name] as Property<P>;
+                return this._properties[name] as Property<P>;
             }
             return null;
         }

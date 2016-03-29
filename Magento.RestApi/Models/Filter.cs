@@ -12,10 +12,10 @@ namespace Magento.RestApi.Models
         /// </summary>
         public Filter()
         {
-            Page = 1;
-            PageSize = 10;
-            SortDirection = SortDirection.asc;
-            FilterExpressions = new List<FilterExpression>();
+            this.Page = 1;
+            this.PageSize = 10;
+            this.SortDirection = SortDirection.asc;
+            this.FilterExpressions = new List<FilterExpression>();
         }
 
         /// <summary>

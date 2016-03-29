@@ -16,8 +16,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public string file_mime_type
         {
-            get { return GetValue(x => x.file_mime_type); }
-            set { SetValue(x => x.file_mime_type, value); }
+            get { return this.GetValue(x => x.file_mime_type); }
+            set { this.SetValue(x => x.file_mime_type, value); }
         }
 
         /// <summary>
@@ -26,8 +26,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(Base64Converter))]
         public byte[] file_content
         {
-            get { return GetValue(x => x.file_content); }
-            set { SetValue(x => x.file_content, value); }
+            get { return this.GetValue(x => x.file_content); }
+            set { this.SetValue(x => x.file_content, value); }
         }
 
         /// <summary>
@@ -36,8 +36,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public string file_name
         {
-            get { return GetValue(x => x.file_name); }
-            set { SetValue(x => x.file_name, value); }
+            get { return this.GetValue(x => x.file_name); }
+            set { this.SetValue(x => x.file_name, value); }
         }
     }
 }

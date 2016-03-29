@@ -18,8 +18,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public int id
         {
-            get { return GetValue(x => x.id); }
-            set { SetValue(x => x.id, value); }
+            get { return this.GetValue(x => x.id); }
+            set { this.SetValue(x => x.id, value); }
         }
 
         /// <summary>
@@ -27,8 +27,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public string label
         {
-            get { return GetValue(x => x.label); }
-            set { SetValue(x => x.label, value); }
+            get { return this.GetValue(x => x.label); }
+            set { this.SetValue(x => x.label, value); }
         }
 
         /// <summary>
@@ -36,8 +36,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public int? position
         {
-            get { return GetValue(x => x.position); }
-            set { SetValue(x => x.position, value); }
+            get { return this.GetValue(x => x.position); }
+            set { this.SetValue(x => x.position, value); }
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? exclude
         {
-            get { return GetValue(x => x.exclude); }
-            set { SetValue(x => x.exclude, value); }
+            get { return this.GetValue(x => x.exclude); }
+            set { this.SetValue(x => x.exclude, value); }
         }
 
         /// <summary>
@@ -55,8 +55,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public string url
         {
-            get { return GetValue(x => x.url); }
-            set { SetValue(x => x.url, value); }
+            get { return this.GetValue(x => x.url); }
+            set { this.SetValue(x => x.url, value); }
         }
 
         /// <summary>
@@ -64,8 +64,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public List<ImageType> types
         {
-            get { return GetValue(x => x.types); }
-            set { SetValue(x => x.types, value); }
+            get { return this.GetValue(x => x.types); }
+            set { this.SetValue(x => x.types, value); }
         }
 
         /// <summary>
@@ -73,8 +73,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public string file_mime_type
         {
-            get { return GetValue(x => x.file_mime_type); }
-            set { SetValue(x => x.file_mime_type, value); }
+            get { return this.GetValue(x => x.file_mime_type); }
+            set { this.SetValue(x => x.file_mime_type, value); }
         }
 
         /// <summary>
@@ -83,8 +83,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(Base64Converter))]
         public byte[] file_content
         {
-            get { return GetValue(x => x.file_content); }
-            set { SetValue(x => x.file_content, value); }
+            get { return this.GetValue(x => x.file_content); }
+            set { this.SetValue(x => x.file_content, value); }
         }
 
         /// <summary>
@@ -93,8 +93,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public string file_name
         {
-            get { return GetValue(x => x.file_name); }
-            set { SetValue(x => x.file_name, value); }
+            get { return this.GetValue(x => x.file_name); }
+            set { this.SetValue(x => x.file_name, value); }
         }
     }
 }

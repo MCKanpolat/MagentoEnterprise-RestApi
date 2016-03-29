@@ -9,7 +9,7 @@ namespace Magento.RestApi.Json
     /// </summary>
     public class DateTimeConverter : JsonConverter
     {
-        private const string dateFormat = "yyyy-MM-dd HH:mm:ss";
+        protected const string dateFormat = "yyyy-MM-dd HH:mm:ss";
 
         public override void WriteJson(JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
         {

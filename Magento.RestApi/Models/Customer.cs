@@ -25,8 +25,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public int entity_id
         {
-            get { return GetValue(x => x.entity_id); }
-            set { SetValue(x => x.entity_id, value); }
+            get { return this.GetValue(x => x.entity_id); }
+            set { this.SetValue(x => x.entity_id, value); }
         }
         /// <summary>
         /// The customer first name
@@ -34,8 +34,8 @@ namespace Magento.RestApi.Models
         /// <remarks>required</remarks>
         public string firstname
         {
-            get { return GetValue(x => x.firstname); }
-            set { SetValue(x => x.firstname, value); }
+            get { return this.GetValue(x => x.firstname); }
+            set { this.SetValue(x => x.firstname, value); }
         }
         /// <summary>
         /// The customer last name
@@ -43,8 +43,8 @@ namespace Magento.RestApi.Models
         /// <remarks>required</remarks>
         public string lastname
         {
-            get { return GetValue(x => x.lastname); }
-            set { SetValue(x => x.lastname, value); }
+            get { return this.GetValue(x => x.lastname); }
+            set { this.SetValue(x => x.lastname, value); }
         }
         /// <summary>
         /// The customer email address
@@ -52,8 +52,8 @@ namespace Magento.RestApi.Models
         /// <remarks>required</remarks>
         public string email
         {
-            get { return GetValue(x => x.email); }
-            set { SetValue(x => x.email, value); }
+            get { return this.GetValue(x => x.email); }
+            set { this.SetValue(x => x.email, value); }
         }
         /// <summary>
         /// The customer password. The password must contain minimum 7 characters
@@ -61,8 +61,8 @@ namespace Magento.RestApi.Models
         /// <remarks>required</remarks>
         public string password
         {
-            get { return GetValue(x => x.password); }
-            set { SetValue(x => x.password, value); }
+            get { return this.GetValue(x => x.password); }
+            set { this.SetValue(x => x.password, value); }
         }
         /// <summary>
         /// Website ID
@@ -70,8 +70,8 @@ namespace Magento.RestApi.Models
         /// <remarks>required</remarks>
         public int website_id
         {
-            get { return GetValue(x => x.website_id); }
-            set { SetValue(x => x.website_id, value); }
+            get { return this.GetValue(x => x.website_id); }
+            set { this.SetValue(x => x.website_id, value); }
         }
         /// <summary>
         /// Customer group ID
@@ -79,8 +79,8 @@ namespace Magento.RestApi.Models
         /// <remarks>required</remarks>
         public int group_id
         {
-            get { return GetValue(x => x.group_id); }
-            set { SetValue(x => x.group_id, value); }
+            get { return this.GetValue(x => x.group_id); }
+            set { this.SetValue(x => x.group_id, value); }
         }
         /// <summary>
         /// Defines whether the automatic group change for the customer will be disabled
@@ -89,8 +89,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? disable_auto_group_change
         {
-            get { return GetValue(x => x.disable_auto_group_change); }
-            set { SetValue(x => x.disable_auto_group_change, value); }
+            get { return this.GetValue(x => x.disable_auto_group_change); }
+            set { this.SetValue(x => x.disable_auto_group_change, value); }
         }
         /// <summary>
         /// Customer prefix
@@ -98,8 +98,8 @@ namespace Magento.RestApi.Models
         /// <remarks>optional</remarks>
         public string prefix
         {
-            get { return GetValue(x => x.prefix); }
-            set { SetValue(x => x.prefix, value); }
+            get { return this.GetValue(x => x.prefix); }
+            set { this.SetValue(x => x.prefix, value); }
         }
         /// <summary>
         /// Customer middle name or initial
@@ -107,8 +107,8 @@ namespace Magento.RestApi.Models
         /// <remarks>optional</remarks>
         public string middlename
         {
-            get { return GetValue(x => x.middlename); }
-            set { SetValue(x => x.middlename, value); }
+            get { return this.GetValue(x => x.middlename); }
+            set { this.SetValue(x => x.middlename, value); }
         }
         /// <summary>
         /// Customer suffix
@@ -116,8 +116,8 @@ namespace Magento.RestApi.Models
         /// <remarks>optional</remarks>
         public string suffix
         {
-            get { return GetValue(x => x.suffix); }
-            set { SetValue(x => x.suffix, value); }
+            get { return this.GetValue(x => x.suffix); }
+            set { this.SetValue(x => x.suffix, value); }
         }
         /// <summary>
         /// Customer Tax or VAT number	
@@ -125,8 +125,8 @@ namespace Magento.RestApi.Models
         /// <remarks>optional</remarks>
         public string taxvat
         {
-            get { return GetValue(x => x.taxvat); }
-            set { SetValue(x => x.taxvat, value); }
+            get { return this.GetValue(x => x.taxvat); }
+            set { this.SetValue(x => x.taxvat, value); }
         }
         /// <summary>
         /// 
@@ -135,8 +135,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? last_logged_in
         {
-            get { return GetValue(x => x.last_logged_in); }
-            set { SetValue(x => x.last_logged_in, value); }
+            get { return this.GetValue(x => x.last_logged_in); }
+            set { this.SetValue(x => x.last_logged_in, value); }
         }
         /// <summary>
         /// 
@@ -145,8 +145,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? created_at
         {
-            get { return GetValue(x => x.created_at); }
-            set { SetValue(x => x.created_at, value); }
+            get { return this.GetValue(x => x.created_at); }
+            set { this.SetValue(x => x.created_at, value); }
         }
         /// <summary>
         /// 
@@ -154,8 +154,8 @@ namespace Magento.RestApi.Models
         /// <remarks>Can't be set</remarks>
         public string created_in
         {
-            get { return GetValue(x => x.created_in); }
-            set { SetValue(x => x.created_in, value); }
+            get { return this.GetValue(x => x.created_in); }
+            set { this.SetValue(x => x.created_in, value); }
         }
     }
 }

@@ -15,18 +15,18 @@ namespace Magento.RestApi.Json
             
             writer.WriteStartObject();
 
-            WriteProperty(product, p => p.entity_id, true, writer, serializer);
-            WriteProperty(product, p => p.firstname, false, writer, serializer);
-            WriteProperty(product, p => p.lastname, false, writer, serializer);
-            WriteProperty(product, p => p.email, false, writer, serializer);
-            WriteProperty(product, p => p.group_id, false, writer, serializer);
-            WriteProperty(product, p => p.middlename, false, writer, serializer);
-            WriteProperty(product, p => p.prefix, false, writer, serializer);
-            WriteProperty(product, p => p.suffix, false, writer, serializer);
-            WriteProperty(product, p => p.taxvat, false, writer, serializer);
-            WriteProperty(product, p => p.password, false, writer, serializer);
-            WriteProperty(product, p => p.website_id, false, writer, serializer);
-            WriteProperty(product, p => p.disable_auto_group_change, false, writer, serializer);
+            this.WriteProperty(product, p => p.entity_id, true, writer, serializer);
+            this.WriteProperty(product, p => p.firstname, false, writer, serializer);
+            this.WriteProperty(product, p => p.lastname, false, writer, serializer);
+            this.WriteProperty(product, p => p.email, false, writer, serializer);
+            this.WriteProperty(product, p => p.group_id, false, writer, serializer);
+            this.WriteProperty(product, p => p.middlename, false, writer, serializer);
+            this.WriteProperty(product, p => p.prefix, false, writer, serializer);
+            this.WriteProperty(product, p => p.suffix, false, writer, serializer);
+            this.WriteProperty(product, p => p.taxvat, false, writer, serializer);
+            this.WriteProperty(product, p => p.password, false, writer, serializer);
+            this.WriteProperty(product, p => p.website_id, false, writer, serializer);
+            this.WriteProperty(product, p => p.disable_auto_group_change, false, writer, serializer);
 
             writer.WriteEndObject();
         }

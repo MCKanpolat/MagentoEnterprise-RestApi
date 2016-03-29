@@ -13,9 +13,9 @@
         /// <param name="fieldValue"></param>
         public FilterExpression(string fieldName, ExpressionOperator expressionOperator, string fieldValue)
         {
-            FieldName = fieldName;
-            ExpressionOperator = expressionOperator;
-            FieldValue = fieldValue;
+            this.FieldName = fieldName;
+            this.ExpressionOperator = expressionOperator;
+            this.FieldValue = fieldValue;
         }
 
         /// <summary>

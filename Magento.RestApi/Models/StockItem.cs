@@ -16,7 +16,7 @@ namespace Magento.RestApi.Models
         /// </summary>
         public StockItem()
         {
-            StartTracking();
+            this.StartTracking();
         }
 
         /// <summary>
@@ -24,8 +24,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public int? item_id
         {
-            get { return GetValue(x => x.item_id); }
-            set { SetValue(x => x.item_id, value); }
+            get { return this.GetValue(x => x.item_id); }
+            set { this.SetValue(x => x.item_id, value); }
         }
 
         /// <summary>
@@ -33,8 +33,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public int? product_id
         {
-            get { return GetValue(x => x.product_id); }
-            set { SetValue(x => x.product_id, value); }
+            get { return this.GetValue(x => x.product_id); }
+            set { this.SetValue(x => x.product_id, value); }
         }
 
         /// <summary>
@@ -42,8 +42,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public int? stock_id
         {
-            get { return GetValue(x => x.stock_id); }
-            set { SetValue(x => x.stock_id, value); }
+            get { return this.GetValue(x => x.stock_id); }
+            set { this.SetValue(x => x.stock_id, value); }
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DoubleConverter))]
         public double? qty
         {
-            get { return GetValue(x => x.qty); }
-            set { SetValue(x => x.qty, value); }
+            get { return this.GetValue(x => x.qty); }
+            set { this.SetValue(x => x.qty, value); }
         }
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DoubleConverter))]
         public double? min_qty
         {
-            get { return GetValue(x => x.min_qty); }
-            set { SetValue(x => x.min_qty, value); }
+            get { return this.GetValue(x => x.min_qty); }
+            set { this.SetValue(x => x.min_qty, value); }
         }
 
         /// <summary>
@@ -72,8 +72,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? use_config_min_qty
         {
-            get { return GetValue(x => x.use_config_min_qty); }
-            set { SetValue(x => x.use_config_min_qty, value); }
+            get { return this.GetValue(x => x.use_config_min_qty); }
+            set { this.SetValue(x => x.use_config_min_qty, value); }
         }
 
         /// <summary>
@@ -82,8 +82,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? is_qty_decimal
         {
-            get { return GetValue(x => x.is_qty_decimal); }
-            set { SetValue(x => x.is_qty_decimal, value); }
+            get { return this.GetValue(x => x.is_qty_decimal); }
+            set { this.SetValue(x => x.is_qty_decimal, value); }
         }
 
         /// <summary>
@@ -91,8 +91,8 @@ namespace Magento.RestApi.Models
         /// </summary>
         public BackOrderStatus? backorders
         {
-            get { return GetValue(x => x.backorders); }
-            set { SetValue(x => x.backorders, value); }
+            get { return this.GetValue(x => x.backorders); }
+            set { this.SetValue(x => x.backorders, value); }
         }
 
         /// <summary>
@@ -101,8 +101,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? use_config_backorders
         {
-            get { return GetValue(x => x.use_config_backorders); }
-            set { SetValue(x => x.use_config_backorders, value); }
+            get { return this.GetValue(x => x.use_config_backorders); }
+            set { this.SetValue(x => x.use_config_backorders, value); }
         }
 
         /// <summary>
@@ -111,8 +111,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DoubleConverter))]
         public double? min_sale_qty
         {
-            get { return GetValue(x => x.min_sale_qty); }
-            set { SetValue(x => x.min_sale_qty, value); }
+            get { return this.GetValue(x => x.min_sale_qty); }
+            set { this.SetValue(x => x.min_sale_qty, value); }
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? use_config_min_sale_qty
         {
-            get { return GetValue(x => x.use_config_min_sale_qty); }
-            set { SetValue(x => x.use_config_min_sale_qty, value); }
+            get { return this.GetValue(x => x.use_config_min_sale_qty); }
+            set { this.SetValue(x => x.use_config_min_sale_qty, value); }
         }
 
         /// <summary>
@@ -131,8 +131,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DoubleConverter))]
         public double? max_sale_qty
         {
-            get { return GetValue(x => x.max_sale_qty); }
-            set { SetValue(x => x.max_sale_qty, value); }
+            get { return this.GetValue(x => x.max_sale_qty); }
+            set { this.SetValue(x => x.max_sale_qty, value); }
         }
 
         /// <summary>
@@ -141,8 +141,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? use_config_max_sale_qty
         {
-            get { return GetValue(x => x.use_config_max_sale_qty); }
-            set { SetValue(x => x.use_config_max_sale_qty, value); }
+            get { return this.GetValue(x => x.use_config_max_sale_qty); }
+            set { this.SetValue(x => x.use_config_max_sale_qty, value); }
         }
 
         /// <summary>
@@ -151,8 +151,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? is_in_stock
         {
-            get { return GetValue(x => x.is_in_stock); }
-            set { SetValue(x => x.is_in_stock, value); }
+            get { return this.GetValue(x => x.is_in_stock); }
+            set { this.SetValue(x => x.is_in_stock, value); }
         }
 
         /// <summary>
@@ -162,8 +162,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? low_stock_date
         {
-            get { return GetValue(x => x.low_stock_date); }
-            set { SetValue(x => x.low_stock_date, value); }
+            get { return this.GetValue(x => x.low_stock_date); }
+            set { this.SetValue(x => x.low_stock_date, value); }
         }
 
         /// <summary>
@@ -172,8 +172,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DoubleConverter))]
         public double? notify_stock_qty
         {
-            get { return GetValue(x => x.notify_stock_qty); }
-            set { SetValue(x => x.notify_stock_qty, value); }
+            get { return this.GetValue(x => x.notify_stock_qty); }
+            set { this.SetValue(x => x.notify_stock_qty, value); }
         }
 
         /// <summary>
@@ -182,8 +182,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? use_config_notify_stock_qty
         {
-            get { return GetValue(x => x.use_config_notify_stock_qty); }
-            set { SetValue(x => x.use_config_notify_stock_qty, value); }
+            get { return this.GetValue(x => x.use_config_notify_stock_qty); }
+            set { this.SetValue(x => x.use_config_notify_stock_qty, value); }
         }
 
         /// <summary>
@@ -192,8 +192,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? manage_stock
         {
-            get { return GetValue(x => x.manage_stock); }
-            set { SetValue(x => x.manage_stock, value); }
+            get { return this.GetValue(x => x.manage_stock); }
+            set { this.SetValue(x => x.manage_stock, value); }
         }
 
         /// <summary>
@@ -202,8 +202,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? use_config_manage_stock
         {
-            get { return GetValue(x => x.use_config_manage_stock); }
-            set { SetValue(x => x.use_config_manage_stock, value); }
+            get { return this.GetValue(x => x.use_config_manage_stock); }
+            set { this.SetValue(x => x.use_config_manage_stock, value); }
         }
 
         /// <summary>
@@ -212,8 +212,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? stock_status_changed_auto
         {
-            get { return GetValue(x => x.stock_status_changed_auto); }
-            set { SetValue(x => x.stock_status_changed_auto, value); }
+            get { return this.GetValue(x => x.stock_status_changed_auto); }
+            set { this.SetValue(x => x.stock_status_changed_auto, value); }
         }
 
         /// <summary>
@@ -222,8 +222,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? use_config_qty_increments
         {
-            get { return GetValue(x => x.use_config_qty_increments); }
-            set { SetValue(x => x.use_config_qty_increments, value); }
+            get { return this.GetValue(x => x.use_config_qty_increments); }
+            set { this.SetValue(x => x.use_config_qty_increments, value); }
         }
 
         /// <summary>
@@ -232,8 +232,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(DoubleConverter))]
         public double? qty_increments
         {
-            get { return GetValue(x => x.qty_increments); }
-            set { SetValue(x => x.qty_increments, value); }
+            get { return this.GetValue(x => x.qty_increments); }
+            set { this.SetValue(x => x.qty_increments, value); }
         }
 
         /// <summary>
@@ -242,8 +242,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? use_config_enable_qty_inc
         {
-            get { return GetValue(x => x.use_config_enable_qty_inc); }
-            set { SetValue(x => x.use_config_enable_qty_inc, value); }
+            get { return this.GetValue(x => x.use_config_enable_qty_inc); }
+            set { this.SetValue(x => x.use_config_enable_qty_inc, value); }
         }
 
         /// <summary>
@@ -252,8 +252,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? enable_qty_increments
         {
-            get { return GetValue(x => x.enable_qty_increments); }
-            set { SetValue(x => x.enable_qty_increments, value); }
+            get { return this.GetValue(x => x.enable_qty_increments); }
+            set { this.SetValue(x => x.enable_qty_increments, value); }
         }
 
         /// <summary>
@@ -262,8 +262,8 @@ namespace Magento.RestApi.Models
         [JsonConverter(typeof(BoolConverter))]
         public bool? is_decimal_divided
         {
-            get { return GetValue(x => x.is_decimal_divided); }
-            set { SetValue(x => x.is_decimal_divided, value); }
+            get { return this.GetValue(x => x.is_decimal_divided); }
+            set { this.SetValue(x => x.is_decimal_divided, value); }
         }
     }
 }
