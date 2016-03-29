@@ -1,61 +1,46 @@
-# Magento.RestApi - An async C# Magento REST API client
+# MagentoEnterprise.RestApi - An async C# Magento REST API client
 
-[Magento](http://www.magentocommerce.com/) is an open source ecommerce platform that allows external applications to interact with it by a SOAP API or REST API. [The REST API](http://www.magentocommerce.com/api/rest/introduction.html) is only available from release 1.7 of Magento. The client only uses the REST API (= no SOAP calls).
+[Magento](http://www.magentocommerce.com/) is an open source ecommerce platform that allows external applications to interact with it by a SOAP API or REST API. [The REST API](http://www.magentocommerce.com/api/rest/introduction.html) is only available from release 1.7 of Magento. The client only uses the REST API (= no SOAP calls). It also has not been tested with Magento Enterprise 2.x
 
-The client is specifically targeted to be used in background processes. Magento REST API uses 3-legged OAuth 1.0a protocol to authenticate the application to access the Magento service. Because it is not very useful to pop up browser windows from a background process (like a windows service) for the user to enter username and password, the client has an authentication method that simulates the login process without opening browser windows.
+MagentoEnterprise.RestApi was forked from the exelent project by @nickvane [nickvane/Magento-RestApi](https://github.com/nickvane/Magento-RestApi). The client is specifically targeted to be used in background processes. Magento REST API uses OAuth 1.0a to retrieve an access token. Because it is not very useful to pop up browser windows from a background process (like a windows service) for the user to enter username and password, the client uses an authentication method originally developed in on [nickvane/Magento-RestApi](https://github.com/nickvane/Magento-RestApi) that simulates the login process without opening browser windows.
 
-[Available from nuget: Magento.RestApi](https://www.nuget.org/packages/Magento.RestApi/1.0.3) (updated to 1.0.3 on 03/10/2015)
+A manager has been implemented on top of this to handle expiration or invalidation of the access tokens. When this happens, updated access token is obtained using the username and password.
+
+[Available from nuget: MagentoEnterprise.RestApi](#) (Comming Soon)
 
 ### Usage
 #### Authentication
 
-For the following code to work, **the user must be an admin** and the REST user and roles have to be configured in Magento (see http://www.magentocommerce.com/api/rest/permission_settings/roles_configuration.html ). 
+For the following code to work the REST user and roles have to be configured in Magento (see http://www.magentocommerce.com/api/rest/permission_settings/roles_configuration.html ). To obtain the access token pair from Magento 1.x the oAuth workflow must be followed once with an Admin:
 
 ```csharp
-var client = new MagentoApi()
-    .Initialize("http://www.yourmagentourl.com", "ConsumerKey", "ConsumerSecret")
-    .AuthenticateAdmin("UserName", "Password");
+var clientManager = new MagentoApiManager(new ApiSettings(){
+		Url = "http://www.yourmagentourl.com",
+                UserName = "UserName",
+                Password = "Password",
+                ConsumerKey = "ConsumerKey",
+                ConsumerSecret = "ConsumerSecret"
+	});
 ```
-
-Or if the magento installation has a custom admin path (like "myadmin"):
+The client can be used with a user that isn't an admin. However the authentication flow currently only works with admin users. The oauth credentials can be provided to the manager directly. 
 
 ```csharp
-var client = new MagentoApi()
-    .SetCustomAdminUrlPart("myadmin")
-    .Initialize("http://www.yourmagentourl.com", "ConsumerKey", "ConsumerSecret")
-    .AuthenticateAdmin("UserName", "Password");
+var clientManager = new MagentoApiManager(new ApiSettings()
+            {
+                Url = "http://www.yourmagentourl.com",
+                AccessKey = "AccessKey",
+                AccessSecret = "AccessSecret"
+            });
 ```
+Some have reported obvious limited functionality when not using an admin user.
 
-If you need to change the oauth callback url:
-
-```csharp
-var client = new MagentoApi()
-    .SetCallbackUrl("https://domainname.com:88")
-    .Initialize("http://www.yourmagentourl.com", "ConsumerKey", "ConsumerSecret")
-    .AuthenticateAdmin("UserName", "Password");
-```
-
-The client can be used with a user that isn't an admin, but the oauth credentials will have to be provided to the client. And not all of the methods will work with a user that isn't an admin.
-
-```csharp
-var client = new MagentoApi()
-    .Initialize("http://www.yourmagentourl.com", "ConsumerKey", "ConsumerSecret")
-    .SetAccessToken("AccessTokenKey", "accessTokenSecret");
-```
-
-*If you have trouble authenticating, you can read the wiki page [authentication steps](https://github.com/nickvane/Magento-RestApi/wiki/Authentication-steps) for more information about the different steps in the authentication process. You can then compare the steps from the page with your own requests you see in [Fiddler](http://fiddler2.com).*
-
-If you are having trouble authenticating to an SSL-secured Magento instance, one failure reason may be the security policy setup on the web server. Many web servers may block SSLv3 because of vulnerabilities like POODLE. However, .NET defaults the `System.Net.ServicePointManager.SecurityProtocol` to be `System.Net.SecurityProtocolType.Ssl3`. To fix this, simply set your application's default to a matching protocol type for your web server instance. For instance, for web servers that require TLSv1.2 for the latest security recommendations, you would set your policy before your authentication call like:
-
-```csharp
-System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-```
-
-#### Client calls
+#### Managed Client calls
 
 The client can then be used like this:
 
 ```csharp
+// refrence the instance
+var client = clientManager.ApiClient;
 // in an async method
 var response = await client.GetProductBySku("123456");
 // not async
@@ -66,33 +51,6 @@ if (!response.HasErrors)
     var product = response.Result;
 }
 ```
-
-**Usage in an ASP.net application**: 
-The client call should be wrapped in a new aync task and should then be registered with the page (from a button click or Page_Load).
-
-```
-protected void ButtonGetProductInfo_Click(object sender, EventArgs e)
-{
-    RegisterAsyncTask(new PageAsyncTask(GetProductInfo));
-}
-
-private async Task GetProductInfo()
-{
-    var response = await client.GetProductBySku(textboxGetProductInfo.Text.Trim());
-    var product = response.Result;
-}
-```
-
-For this to work, you need to add Async="true" to the page directive
-
-```
-<%@ Page Title="Async" Language="C#" CodeBehind="Async.aspx.cs" Inherits="Whatever" Async="true" %>
-```
-
-Some good reading here:
-[The Magic of using Asynchronous Methods in ASP.NET 4.5 plus an important gotcha](http://www.hanselman.com/blog/TheMagicOfUsingAsynchronousMethodsInASPNET45PlusAnImportantGotcha.aspx)
-
-Thank you [Scotty79](https://github.com/Scotty79) for figuring that out, from [issue 11](https://github.com/nickvane/Magento-RestApi/issues/11)
 
 ### Features
 
@@ -116,6 +74,16 @@ Following Magento REST API features are currently implemented:
 
 For the supported features and usage of the library take a look at the integration tests.
 
+### Troubleshooting
+#### Authentication
+
+If you are having issues with Authentication you may find the wiki page about [authentication steps](https://github.com/nickvane/Magento-RestApi/wiki/Authentication-steps) helpful for information about the different steps in the authentication process. You can then compare the steps from the page with your own requests you see in [Fiddler](http://fiddler2.com).*
+
+If you are having trouble authenticating to an SSL-secured Magento instance, one failure reason may be the security policy setup on the web server. Many web servers may block SSLv3 because of vulnerabilities like POODLE. However, .NET defaults the `System.Net.ServicePointManager.SecurityProtocol` to be `System.Net.SecurityProtocolType.Ssl3`. To fix this, simply set your application's default to a matching protocol type for your web server instance. For instance, for web servers that require TLSv1.2 for the latest security recommendations, you would set your policy before your authentication call like:
+
+```csharp
+System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+```
 
 ### More info
 
