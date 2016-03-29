@@ -89,6 +89,7 @@ System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolTyp
 
 The library is tested against Magento versions:
 
+* 1.14.2.2
 * 1.7.0.*: all actions tested
 * 1.9.1.*: authentication tested
 
