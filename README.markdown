@@ -14,7 +14,7 @@ A manager has been implemented on top of this to handle expiration or invalidati
 For the following code to work the REST user and roles have to be configured in Magento (see http://www.magentocommerce.com/api/rest/permission_settings/roles_configuration.html ). To obtain the access token pair from Magento 1.x the oAuth workflow must be followed once with an Admin:
 
 ```csharp
-var clientManager = new MagentoApiManager(new ApiSettings(){
+var client = new MagentoApi(new ApiSettings(){
 		Url = "http://www.yourmagentourl.com",
                 UserName = "UserName",
                 Password = "Password",
@@ -22,21 +22,28 @@ var clientManager = new MagentoApiManager(new ApiSettings(){
                 ConsumerSecret = "ConsumerSecret"
 	});
 ```
-The client can be used with a user that isn't an admin. However the authentication flow currently only works with admin users. The oauth credentials can be provided to the manager directly. 
+Once you have authenticated you can save the OAuth access token pair via:
+
+```csharp
+var accessTokenKey = client.Settings.AccessKey;
+var accessTokenSecret = client.Settings.AccessSecret;
+```
+
+The OAuth access token pair can then be provided to the client directly. 
 
 ```csharp
 var clientManager = new MagentoApiManager(new ApiSettings()
             {
                 Url = "http://www.yourmagentourl.com",
-                AccessKey = "AccessKey",
-                AccessSecret = "AccessSecret"
+                AccessKey = "AccessTokenKey",
+                AccessSecret = "AccessTokenSecret"
             });
 ```
-Some have reported obvious limited functionality when not using an admin user.
+The client can be used with a user that isn't an admin. However the authentication flow currently only works with admin users so you must get the oAuth access token pair seperately. Some have reported obvious limited functionality when not using an admin user.
 
 #### Managed Client calls
 
-The client can then be used like this:
+Once you have an oAuth access token pair, the client can then be used like this:
 
 ```csharp
 // refrence the instance
@@ -56,7 +63,7 @@ if (!response.HasErrors)
 
 * Can be used in multiple threads
 * Keeps track of changed properties so only changed values are updated
-* If oauth token is rejected after some time, the client re-authenticates and executes the failed request again.
+* If OAuth token is rejected after some time, the client re-authenticates and executes the failed request again if you supplied username and password for a admin user.
 
 Following Magento REST API features are currently implemented:
 
